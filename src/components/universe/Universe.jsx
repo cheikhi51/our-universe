@@ -2,9 +2,11 @@ import { useState, useRef } from "react";
 import { planets } from "../../data/planets";
 import Planet from "./Planet";
 import PlanetDetails from "./PlanetDetails";
+import MemoriesWorld from "our-universe/src/components/worlds/MemoriesWorld.jsx";
 
 function Universe() {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
+  const [activeWorld, setActiveWorld] = useState(null);
   const stageRef = useRef(null);
 
   const handlePlanetClick = (planet) => {
@@ -33,6 +35,12 @@ function Universe() {
 
     stage.style.setProperty("--stage-tilt-x", "0deg");
     stage.style.setProperty("--stage-tilt-y", "0deg");
+  };
+
+
+  const handleExplore = (planet) => {
+    setSelectedPlanet(null);
+    setActiveWorld(planet.id);
   };
 
   return (
