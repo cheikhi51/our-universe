@@ -1,28 +1,39 @@
+import TimelineMilestones from "./TimelineMilestones";
+
 function PlanetDetails({ planet, onClose }) {
   if (!planet) return null;
 
   return (
     <div className="planet-details">
 
-      <button
+      <div
         className="close-button"
+      >
+        <button 
         onClick={onClose}
         aria-label="Close"
-      >
-        ×
-      </button>
+        >
+          ×
+        </button>
+      </div>
 
       <h2>{planet.name}</h2>
 
       <p>{planet.description}</p>
 
-      <span className="details-stats">
-        {planet.stats}
-      </span>
+      {planet.id === "timeline" ? (
+        <TimelineMilestones />
+      ) : (
+        <>
+          <span className="details-stats">
+            {planet.stats}
+          </span>
 
-      <button className="explore-button">
-        Explore
-      </button>
+          <button className="explore-button">
+            Explore
+          </button>
+        </>
+      )}
 
     </div>
   );

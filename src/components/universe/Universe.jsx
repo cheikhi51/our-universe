@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { planets } from "../../data/planets";
 import Planet from "./Planet";
 import PlanetDetails from "./PlanetDetails";
 
 function Universe() {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
+  const stageRef = useRef(null);
 
   const handlePlanetClick = (planet) => {
     setSelectedPlanet(planet);
@@ -12,6 +13,26 @@ function Universe() {
 
   const closePlanet = () => {
     setSelectedPlanet(null);
+  };
+
+  const handleStageMouseMove = (e) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const rect = stage.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    stage.style.setProperty("--stage-tilt-x", `${(-y * 8).toFixed(2)}deg`);
+    stage.style.setProperty("--stage-tilt-y", `${(x * 8).toFixed(2)}deg`);
+  };
+
+  const handleStageMouseLeave = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    stage.style.setProperty("--stage-tilt-x", "0deg");
+    stage.style.setProperty("--stage-tilt-y", "0deg");
   };
 
   return (
@@ -30,7 +51,12 @@ function Universe() {
         <p>Our little universe, just for us.</p>
       </header>
 
-      <section className="universe-stage">
+      <section
+        className="universe-stage"
+        ref={stageRef}
+        onMouseMove={handleStageMouseMove}
+        onMouseLeave={handleStageMouseLeave}
+      >
 
         {/* Orbits */}
         <div className="orbit orbit-one" />
