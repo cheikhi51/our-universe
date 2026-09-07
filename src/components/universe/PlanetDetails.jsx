@@ -1,36 +1,34 @@
-import TimelineMilestones from "./TimelineMilestones";
 
-function PlanetDetails({ planet, onClose }) {
+
+function PlanetDetails({ planet, onClose , onExplore}) {
   if (!planet) return null;
 
   return (
     <div className="planet-details">
-
-      <div
-        className="close-button"
-      >
         <button 
+        className="close-button"
         onClick={onClose}
         aria-label="Close"
         >
           ×
         </button>
-      </div>
 
       <h2>{planet.name}</h2>
 
       <p>{planet.description}</p>
 
-      {planet.id === "timeline" ? (
-        <TimelineMilestones />
-      ) : (
+      {planet.stats && (
         <>
           <span className="details-stats">
             {planet.stats}
           </span>
 
-          <button className="explore-button">
+          <button
+            className="explore-button"
+            onClick={() => onExplore(planet)}
+          >
             Explore
+            <span>→</span>
           </button>
         </>
       )}

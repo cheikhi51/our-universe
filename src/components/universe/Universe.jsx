@@ -2,7 +2,12 @@ import { useState, useRef } from "react";
 import { planets } from "../../data/planets";
 import Planet from "./Planet";
 import PlanetDetails from "./PlanetDetails";
-import MemoriesWorld from "our-universe/src/components/worlds/MemoriesWorld.jsx";
+import MemoriesWorld from "./worlds/MemoriesWorld";
+import MessagesWorld from "./worlds/MessagesWorld";
+import TimelineWorld from "./worlds/TimelineWorld";
+import MusicWorld from "./worlds/MusicWorld";
+import MomentsWorld from "./worlds/MomentsWorld";
+import OurSpaceWorld from "./worlds/OurSpaceWorld";
 
 function Universe() {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
@@ -42,7 +47,50 @@ function Universe() {
     setSelectedPlanet(null);
     setActiveWorld(planet.id);
   };
+  
+  if (activeWorld === "timeline") {
+  return (
+    <TimelineWorld
+      onBack={() => setActiveWorld(null)}
+    />
+  );
+}
+  if (activeWorld === "memories") {
+  return (
+    <MemoriesWorld
+      onBack={() => setActiveWorld(null)}
+    />
+  );
+}
 
+if (activeWorld === "messages") {
+  return (
+    <MessagesWorld
+      onBack={() => setActiveWorld(null)}
+    />
+  );
+}
+if (activeWorld === "music") {
+  return (
+    <MusicWorld
+    onBack={() => setActiveWorld(null)}
+    />
+  );
+}
+if (activeWorld === "moments") {
+  return (
+    <MomentsWorld
+      onBack={() => setActiveWorld(null)}
+    />
+  );
+}
+if (activeWorld === "space") {
+  return(
+    <OurSpaceWorld 
+      onBack={() => setActiveWorld(null)} 
+    />
+  ) 
+}
   return (
     <main className={`universe ${
       selectedPlanet ? "universe-planet-open" : ""
@@ -95,6 +143,7 @@ function Universe() {
           <PlanetDetails
             planet={selectedPlanet}
             onClose={closePlanet}
+            onExplore={handleExplore}
           />
         )}
 
