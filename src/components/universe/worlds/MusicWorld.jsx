@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { musicTracks } from "../../../data/music";
+import SpotifyPlaylist from "../SpotifyPlaylist";
 
 function MusicWorld({ onBack }) {
   const audioRef = useRef(null);
