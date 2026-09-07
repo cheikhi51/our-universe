@@ -8295,3 +8295,426 @@ button {
 
   transition: width 0.1s linear;
 }
+
+/* =================================
+   MUSIC CONTROLS
+================================= */
+
+.music-control-active {
+  color: rgba(220, 190, 255, 0.95) !important;
+
+  text-shadow:
+    0 0 12px rgba(220, 190, 255, 0.6);
+}
+
+
+/* =================================
+   VOLUME
+================================= */
+
+.music-volume {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  width: 100%;
+
+  margin-top: 22px;
+}
+
+.music-volume-button {
+  border: none;
+
+  background: transparent;
+
+  color: white;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  opacity: 0.8;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.music-volume-button:hover {
+  opacity: 1;
+
+  transform: scale(1.1);
+}
+
+.music-volume input {
+  width: 130px;
+
+  cursor: pointer;
+
+  accent-color: rgba(220, 190, 255, 0.9);
+}
+
+
+/* =================================
+   PERSISTENT MINI PLAYER
+================================= */
+
+.music-mini-player {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 22px;
+
+  transform: translateX(-50%);
+
+  z-index: 1000;
+
+  width: min(900px, calc(100vw - 40px));
+
+  min-height: 74px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 22px;
+
+  padding: 12px 18px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 20px;
+
+  background:
+    rgba(13, 10, 24, 0.78);
+
+  backdrop-filter: blur(22px);
+
+  -webkit-backdrop-filter: blur(22px);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(140, 90, 200, 0.08);
+
+  animation:
+    musicMiniPlayerEnter 0.45s ease;
+}
+
+@keyframes musicMiniPlayerEnter {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0);
+  }
+
+}
+
+
+/* =================================
+   MINI TRACK
+================================= */
+
+.music-mini-track {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 190px;
+
+  flex: 1;
+}
+
+.music-mini-icon {
+  width: 44px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  font-size: 20px;
+}
+
+.music-mini-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.music-mini-info strong {
+  color: white;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.music-mini-info small {
+  color: rgba(255, 255, 255, 0.48);
+
+  font-size: 11px;
+}
+
+
+/* =================================
+   MINI CONTROLS
+================================= */
+
+.music-mini-controls {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+}
+
+.music-mini-controls button {
+  width: 32px;
+
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  border-radius: 50%;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.music-mini-controls button:hover {
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  color: white;
+
+  transform: scale(1.08);
+}
+
+.music-mini-play {
+  width: 40px !important;
+
+  height: 40px !important;
+
+  background:
+    rgba(255, 255, 255, 0.95) !important;
+
+  color: #111 !important;
+
+  font-size: 13px !important;
+}
+
+.music-mini-play:hover {
+  transform: scale(1.08);
+}
+
+
+/* =================================
+   MINI VOLUME
+================================= */
+
+.music-mini-volume {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.music-mini-volume button {
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+.music-mini-volume input {
+  width: 75px;
+
+  cursor: pointer;
+
+  accent-color:
+    rgba(220, 190, 255, 0.9);
+}
+
+
+/* =================================
+   EXPAND BUTTON
+================================= */
+
+.music-mini-expand {
+  width: 32px;
+
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  color:
+    rgba(255, 255, 255, 0.7);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.music-mini-expand:hover {
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  color: white;
+}
+
+
+/* =================================
+   MINI PROGRESS
+================================= */
+
+.music-mini-progress {
+  position: absolute;
+
+  left: 18px;
+
+  right: 18px;
+
+  bottom: 0;
+
+  height: 2px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.music-mini-progress span {
+  display: block;
+
+  height: 100%;
+
+  width: 0;
+
+  border-radius: inherit;
+
+  background:
+    rgba(220, 190, 255, 0.8);
+
+  transition:
+    width 0.15s linear;
+}
+
+
+/* =================================
+   RESPONSIVE
+================================= */
+
+@media (max-width: 700px) {
+
+  .music-mini-player {
+    width:
+      calc(100vw - 20px);
+
+    bottom: 10px;
+
+    gap: 10px;
+
+    padding:
+      10px 12px;
+  }
+
+  .music-mini-track {
+    min-width: 0;
+  }
+
+  .music-mini-volume {
+    display: none;
+  }
+
+  .music-mini-controls {
+    gap: 2px;
+  }
+
+  .music-mini-controls button:nth-child(1),
+  .music-mini-controls button:nth-child(5) {
+    display: none;
+  }
+
+  .music-mini-expand {
+    display: none;
+  }
+
+}
+

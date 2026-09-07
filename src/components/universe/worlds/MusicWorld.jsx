@@ -4,11 +4,28 @@ import { musicTracks } from "../../../data/music";
 function MusicWorld({ onBack }) {
   const audioRef = useRef(null);
   const progressRef = useRef(null);
+  const volumeRef = useRef(null);
 
   const [selectedTrack, setSelectedTrack] = useState(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
+
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  const [volume, setVolume] = useState(0.8);
+  const [previousVolume, setPreviousVolume] = useState(0.8);
+
+  const [isMuted, setIsMuted] = useState(false);
+
+  const [isShuffle, setIsShuffle] = useState(false);
+
+  // "off" | "all" | "one"
+  const [repeatMode, setRepeatMode] = useState("off");
+
+  /* =================================
+     OPEN TRACK
+  ================================= */
 
   const openTrack = (track, autoPlay = true) => {
     setSelectedTrack(track);
@@ -20,14 +37,12 @@ function MusicWorld({ onBack }) {
     }
   };
 
-  const closeTrack = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+  /* =================================
+     CLOSE PLAYER MODAL
+  ================================= */
 
-    setIsPlaying(false);
+  const closeTrack = () => {
     setSelectedTrack(null);
-    setCurrentTime(0);
   };
 
   /* =================================
@@ -52,18 +67,66 @@ function MusicWorld({ onBack }) {
   };
 
   /* =================================
+     FIND CURRENT INDEX
+  ================================= */
+
+  const getCurrentIndex = () => {
+    if (!selectedTrack) return -1;
+
+    return musicTracks.findIndex(
+      (track) => track.id === selectedTrack.id
+    );
+  };
+
+  /* =================================
      NEXT TRACK
   ================================= */
 
   const playNext = () => {
     if (!selectedTrack) return;
 
-    const currentIndex = musicTracks.findIndex(
-      (track) => track.id === selectedTrack.id
-    );
+    let nextIndex;
 
-    const nextIndex =
-      (currentIndex + 1) % musicTracks.length;
+    /*
+      SHUFFLE
+    */
+
+    if (isShuffle && musicTracks.length > 1) {
+      const currentIndex = getCurrentIndex();
+
+      const availableIndexes = musicTracks
+        .map((_, index) => index)
+        .filter((index) => index !== currentIndex);
+
+      const randomPosition = Math.floor(
+        Math.random() * availableIndexes.length
+      );
+
+      nextIndex = availableIndexes[randomPosition];
+    }
+
+    /*
+      NORMAL PLAYBACK
+    */
+
+    else {
+      const currentIndex = getCurrentIndex();
+
+      nextIndex = currentIndex + 1;
+
+      /*
+        REPEAT ALL
+      */
+
+      if (nextIndex >= musicTracks.length) {
+        if (repeatMode === "all") {
+          nextIndex = 0;
+        } else {
+          setIsPlaying(false);
+          return;
+        }
+      }
+    }
 
     openTrack(musicTracks[nextIndex], true);
   };
@@ -75,15 +138,32 @@ function MusicWorld({ onBack }) {
   const playPrevious = () => {
     if (!selectedTrack) return;
 
-    const currentIndex = musicTracks.findIndex(
-      (track) => track.id === selectedTrack.id
+    /*
+      If we're more than 3 seconds into
+      the current song, restart it.
+    */
+
+    if (
+      audioRef.current &&
+      audioRef.current.currentTime > 3
+    ) {
+      audioRef.current.currentTime = 0;
+      return;
+    }
+
+    const currentIndex = getCurrentIndex();
+
+    let previousIndex = currentIndex - 1;
+
+    if (previousIndex < 0) {
+      previousIndex =
+        musicTracks.length - 1;
+    }
+
+    openTrack(
+      musicTracks[previousIndex],
+      true
     );
-
-    const previousIndex =
-      (currentIndex - 1 + musicTracks.length) %
-      musicTracks.length;
-
-    openTrack(musicTracks[previousIndex], true);
   };
 
   /* =================================
@@ -96,6 +176,11 @@ function MusicWorld({ onBack }) {
     if (!audio || !selectedTrack) return;
 
     audio.src = selectedTrack.src;
+
+    audio.volume = isMuted
+      ? 0
+      : volume;
+
     audio.load();
 
     const handleLoadedMetadata = () => {
@@ -107,6 +192,22 @@ function MusicWorld({ onBack }) {
     };
 
     const handleEnded = () => {
+      /*
+        REPEAT ONE
+      */
+
+      if (repeatMode === "one") {
+        audio.currentTime = 0;
+
+        audio.play().catch(() => {});
+
+        return;
+      }
+
+      /*
+        NEXT TRACK
+      */
+
       playNext();
     };
 
@@ -129,7 +230,11 @@ function MusicWorld({ onBack }) {
       audio
         .play()
         .catch((error) => {
-          console.error("Unable to autoplay:", error);
+          console.error(
+            "Unable to autoplay:",
+            error
+          );
+
           setIsPlaying(false);
         });
     }
@@ -151,6 +256,133 @@ function MusicWorld({ onBack }) {
       );
     };
   }, [selectedTrack]);
+
+  /* =================================
+     VOLUME
+  ================================= */
+
+  const handleVolumeChange = (event) => {
+    const newVolume =
+      Number(event.target.value);
+
+    setVolume(newVolume);
+
+    setPreviousVolume(
+      newVolume > 0
+        ? newVolume
+        : previousVolume
+    );
+
+    if (newVolume > 0) {
+      setIsMuted(false);
+    }
+
+    if (audioRef.current) {
+      audioRef.current.volume =
+        newVolume;
+    }
+  };
+
+  /* =================================
+     MUTE
+  ================================= */
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+
+    if (isMuted) {
+      const restoredVolume =
+        previousVolume || 0.8;
+
+      setVolume(restoredVolume);
+      setIsMuted(false);
+
+      audioRef.current.volume =
+        restoredVolume;
+    } else {
+      setPreviousVolume(volume);
+      setVolume(0);
+      setIsMuted(true);
+
+      audioRef.current.volume = 0;
+    }
+  };
+
+  /* =================================
+     SHUFFLE
+  ================================= */
+
+  const toggleShuffle = () => {
+    setIsShuffle((previous) => !previous);
+  };
+
+  /* =================================
+     REPEAT
+  ================================= */
+
+  const toggleRepeat = () => {
+    setRepeatMode((current) => {
+      if (current === "off") {
+        return "all";
+      }
+
+      if (current === "all") {
+        return "one";
+      }
+
+      return "off";
+    });
+  };
+
+  /* =================================
+     SEEK
+  ================================= */
+
+  const handleProgressClick = (event) => {
+    if (!audioRef.current || !duration) {
+      return;
+    }
+
+    const rect =
+      progressRef.current.getBoundingClientRect();
+
+    const clickPosition =
+      event.clientX - rect.left;
+
+    const percentage =
+      clickPosition / rect.width;
+
+    const newTime =
+      percentage * duration;
+
+    audioRef.current.currentTime =
+      newTime;
+
+    setCurrentTime(newTime);
+  };
+
+  /* =================================
+     TIME FORMAT
+  ================================= */
+
+  const formatTime = (time) => {
+    if (
+      !time ||
+      Number.isNaN(time)
+    ) {
+      return "0:00";
+    }
+
+    const minutes =
+      Math.floor(time / 60);
+
+    const seconds =
+      Math.floor(time % 60)
+        .toString()
+        .padStart(2, "0");
+
+    return `${minutes}:${seconds}`;
+  };
 
   /* =================================
      KEYBOARD
@@ -196,60 +428,20 @@ function MusicWorld({ onBack }) {
         handleKeyDown
       );
     };
-  }, [selectedTrack]);
-
-  /* =================================
-     SEEK
-  ================================= */
-
-  const handleProgressClick = (event) => {
-    if (!audioRef.current || !duration) return;
-
-    const rect =
-      progressRef.current.getBoundingClientRect();
-
-    const clickPosition =
-      event.clientX - rect.left;
-
-    const percentage =
-      clickPosition / rect.width;
-
-    audioRef.current.currentTime =
-      percentage * duration;
-
-    setCurrentTime(
-      percentage * duration
-    );
-  };
-
-  /* =================================
-     TIME FORMAT
-  ================================= */
-
-  const formatTime = (time) => {
-    if (!time || Number.isNaN(time)) {
-      return "0:00";
-    }
-
-    const minutes = Math.floor(time / 60);
-
-    const seconds = Math.floor(time % 60)
-      .toString()
-      .padStart(2, "0");
-
-    return `${minutes}:${seconds}`;
-  };
+  }, [selectedTrack, isShuffle, repeatMode]);
 
   return (
     <main className="music-world">
 
       {/* =================================
-          AUDIO ELEMENT
+          AUDIO
       ================================= */}
 
       <audio ref={audioRef} />
 
-      {/* Atmosphere */}
+      {/* =================================
+          ATMOSPHERE
+      ================================= */}
 
       <div className="music-stars music-stars-one" />
       <div className="music-stars music-stars-two" />
@@ -258,7 +450,9 @@ function MusicWorld({ onBack }) {
       <div className="music-nebula music-nebula-one" />
       <div className="music-nebula music-nebula-two" />
 
-      {/* Header */}
+      {/* =================================
+          HEADER
+      ================================= */}
 
       <header className="music-header">
 
@@ -307,7 +501,9 @@ function MusicWorld({ onBack }) {
 
       </header>
 
-      {/* Intro */}
+      {/* =================================
+          CONTENT
+      ================================= */}
 
       <section className="music-content">
 
@@ -325,7 +521,7 @@ function MusicWorld({ onBack }) {
 
         </div>
 
-        {/* Featured */}
+        {/* FEATURED */}
 
         <section className="music-featured">
 
@@ -374,6 +570,7 @@ function MusicWorld({ onBack }) {
             <button
               className="music-play-button"
               onClick={() => {
+
                 if (
                   selectedTrack?.id ===
                   musicTracks[0].id
@@ -385,6 +582,7 @@ function MusicWorld({ onBack }) {
                     true
                   );
                 }
+
               }}
             >
 
@@ -410,7 +608,9 @@ function MusicWorld({ onBack }) {
 
         </section>
 
-        {/* Track list */}
+        {/* =================================
+            TRACK LIST
+        ================================= */}
 
         <section className="music-list">
 
@@ -514,7 +714,9 @@ function MusicWorld({ onBack }) {
 
       </section>
 
-      {/* Footer */}
+      {/* =================================
+          FOOTER
+      ================================= */}
 
       <footer className="music-footer">
 
@@ -529,7 +731,7 @@ function MusicWorld({ onBack }) {
       </footer>
 
       {/* =================================
-          PLAYER
+          FULL PLAYER MODAL
       ================================= */}
 
       {selectedTrack && (
@@ -585,8 +787,6 @@ function MusicWorld({ onBack }) {
               {selectedTrack.album}
             </p>
 
-            {/* Progress */}
-
             <div
               ref={progressRef}
               className="music-player-progress"
@@ -627,6 +827,18 @@ function MusicWorld({ onBack }) {
             <div className="music-player-controls">
 
               <button
+                className={
+                  isShuffle
+                    ? "music-control-active"
+                    : ""
+                }
+                onClick={toggleShuffle}
+                aria-label="Shuffle"
+              >
+                🔀
+              </button>
+
+              <button
                 onClick={playPrevious}
                 aria-label="Previous"
               >
@@ -654,6 +866,57 @@ function MusicWorld({ onBack }) {
                 ⏭
               </button>
 
+              <button
+                className={
+                  repeatMode !== "off"
+                    ? "music-control-active"
+                    : ""
+                }
+                onClick={toggleRepeat}
+                aria-label="Repeat"
+              >
+                {repeatMode === "one"
+                  ? "🔂"
+                  : "🔁"}
+              </button>
+
+            </div>
+
+            {/* Volume */}
+
+            <div className="music-volume">
+
+              <button
+                className="music-volume-button"
+                onClick={toggleMute}
+                aria-label={
+                  isMuted
+                    ? "Unmute"
+                    : "Mute"
+                }
+              >
+                {isMuted || volume === 0
+                  ? "🔇"
+                  : volume < 0.5
+                  ? "🔉"
+                  : "🔊"}
+              </button>
+
+              <input
+                ref={volumeRef}
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={
+                  isMuted
+                    ? 0
+                    : volume
+                }
+                onChange={handleVolumeChange}
+                aria-label="Volume"
+              />
+
             </div>
 
             <p className="music-player-description">
@@ -661,6 +924,151 @@ function MusicWorld({ onBack }) {
             </p>
 
           </article>
+
+        </div>
+      )}
+
+      {/* =================================
+          PERSISTENT MINI PLAYER
+      ================================= */}
+
+      {selectedTrack && (
+
+        <div className="music-mini-player">
+
+          <div className="music-mini-track">
+
+            <div className="music-mini-icon">
+              {selectedTrack.icon}
+            </div>
+
+            <div className="music-mini-info">
+
+              <strong>
+                {selectedTrack.title}
+              </strong>
+
+              <small>
+                {selectedTrack.artist}
+              </small>
+
+            </div>
+
+          </div>
+
+          <div className="music-mini-controls">
+
+            <button
+              className={
+                isShuffle
+                  ? "music-control-active"
+                  : ""
+              }
+              onClick={toggleShuffle}
+              aria-label="Shuffle"
+            >
+              🔀
+            </button>
+
+            <button
+              onClick={playPrevious}
+              aria-label="Previous"
+            >
+              ⏮
+            </button>
+
+            <button
+              className="music-mini-play"
+              onClick={togglePlay}
+              aria-label={
+                isPlaying
+                  ? "Pause"
+                  : "Play"
+              }
+            >
+              {isPlaying
+                ? "❚❚"
+                : "▶"}
+            </button>
+
+            <button
+              onClick={playNext}
+              aria-label="Next"
+            >
+              ⏭
+            </button>
+
+            <button
+              className={
+                repeatMode !== "off"
+                  ? "music-control-active"
+                  : ""
+              }
+              onClick={toggleRepeat}
+              aria-label="Repeat"
+            >
+              {repeatMode === "one"
+                ? "🔂"
+                : "🔁"}
+            </button>
+
+          </div>
+
+          <div className="music-mini-volume">
+
+            <button
+              onClick={toggleMute}
+              aria-label={
+                isMuted
+                  ? "Unmute"
+                  : "Mute"
+              }
+            >
+              {isMuted || volume === 0
+                ? "🔇"
+                : "🔊"}
+            </button>
+
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={
+                isMuted
+                  ? 0
+                  : volume
+              }
+              onChange={handleVolumeChange}
+              aria-label="Volume"
+            />
+
+          </div>
+
+          <button
+            className="music-mini-expand"
+            onClick={() => setSelectedTrack(selectedTrack)}
+            aria-label="Open player"
+          >
+            ↑
+          </button>
+
+          <div className="music-mini-progress">
+
+            <span
+              style={{
+                width:
+                  duration > 0
+                    ? `${(
+                        (currentTime /
+                          duration) *
+                        100
+                      ).toFixed(2)}%`
+                    : "0%",
+              }}
+            />
+
+          </div>
 
         </div>
       )}
