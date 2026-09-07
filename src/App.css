@@ -8240,3 +8240,58 @@ button {
     right: 15px;
   }
 }
+/* =================================
+   MUSIC PLAYER FUNCTIONAL STATES
+================================= */
+
+.music-record-playing,
+.music-player-record-playing {
+  animation:
+    musicRecordSpin 8s linear infinite;
+}
+
+@keyframes musicRecordSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Active track */
+
+.music-track-active {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.16);
+
+  transform: translateX(4px);
+}
+
+.music-track-active .music-track-number {
+  color: rgba(220, 190, 255, 0.9);
+}
+
+.music-track-active .music-track-arrow {
+  color: rgba(220, 190, 255, 0.9);
+}
+
+
+/* Clickable progress bar */
+
+.music-player-progress {
+  cursor: pointer;
+}
+
+.music-player-progress span {
+  display: block;
+
+  height: 100%;
+
+  width: 0;
+
+  transition: width 0.1s linear;
+}
