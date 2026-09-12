@@ -1,34 +1,89 @@
-import { useState } from "react";
-import {
-  getMyUniverse,
-} from "../../../services/universeService";
+import { useEffect, useState } from "react";
+import { getMyUniverse } from "../../../services/universeService";
 import {
   updateMemory,
   uploadMemoryPhoto,
 } from "../../../services/memoriesService";
 
-function EditMemory({
-  memory,
-  onClose,
-  onMemoryUpdated,
-}) {
+function EditMemory({ memory, onClose, onMemoryUpdated }) {
   const [title, setTitle] = useState(memory.title || "");
   const [description, setDescription] = useState(
     memory.description || ""
   );
-
   const [memoryDate, setMemoryDate] = useState(
     memory.memory_date || ""
   );
 
   const [image, setImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(
+    memory.image || ""
+  );
 
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!image) return;
+
+    const url = URL.createObjectURL(image);
+    setPreviewUrl(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+
+  useEffect(() => {
+    function handleEscape(event) {
+      if (event.key === "Escape" && !loading) {
+        onClose?.();
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleEscape
+      );
+    };
+  }, [loading, onClose]);
+
+  function handleImageChange(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    setError("");
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError(
+        "Please choose a JPG, PNG or WebP image."
+      );
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError(
+        "This image is too large. Please choose an image smaller than 10 MB."
+      );
+      return;
+    }
+
+    setImage(file);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     setError("");
+    setStatus("");
 
     if (!title.trim()) {
       setError("Please give this memory a title.");
@@ -44,9 +99,9 @@ function EditMemory({
         memory_date: memoryDate || null,
       };
 
-      // If the user selected a new image,
-      // upload it first.
       if (image) {
+        setStatus("Uploading new photo...");
+
         const universeMembership =
           await getMyUniverse();
 
@@ -59,26 +114,26 @@ function EditMemory({
           );
         }
 
-        const imagePath =
-          await uploadMemoryPhoto(
-            universeId,
-            image
-          );
+        const imagePath = await uploadMemoryPhoto(
+          universeId,
+          image
+        );
 
         updates.image_path = imagePath;
       }
 
-      const updatedMemory =
-        await updateMemory(
-          memory.id,
-          updates
-        );
+      setStatus("Saving memory...");
+
+      const updatedMemory = await updateMemory(
+        memory.id,
+        updates
+      );
 
       onMemoryUpdated?.({
         ...updatedMemory,
-        image_url: image
-          ? null
-          : memory.image,
+        image_url:
+          updatedMemory.image_url ||
+          memory.image,
       });
 
       onClose?.();
@@ -90,10 +145,11 @@ function EditMemory({
 
       setError(
         err.message ||
-          "Unable to update this memory."
+          "Unable to update this memory. Please try again."
       );
     } finally {
       setLoading(false);
+      setStatus("");
     }
   }
 
@@ -102,12 +158,14 @@ function EditMemory({
       className="add-memory-overlay"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="edit-memory-title"
     >
       <div className="add-memory-card">
         <button
           className="add-memory-close"
           onClick={onClose}
           type="button"
+          disabled={loading}
           aria-label="Close"
         >
           ×
@@ -119,11 +177,12 @@ function EditMemory({
           <div>
             <p>OUR UNIVERSE</p>
 
-            <h2>Edit Memory</h2>
+            <h2 id="edit-memory-title">
+              Edit Memory
+            </h2>
 
             <span>
-              Update this little piece of
-              our story.
+              Update this little piece of our story.
             </span>
           </div>
         </div>
@@ -141,6 +200,7 @@ function EditMemory({
               onChange={(event) =>
                 setTitle(event.target.value)
               }
+              disabled={loading}
               required
             />
           </label>
@@ -152,10 +212,9 @@ function EditMemory({
               type="date"
               value={memoryDate}
               onChange={(event) =>
-                setMemoryDate(
-                  event.target.value
-                )
+                setMemoryDate(event.target.value)
               }
+              disabled={loading}
             />
           </label>
 
@@ -165,11 +224,10 @@ function EditMemory({
             <textarea
               value={description}
               onChange={(event) =>
-                setDescription(
-                  event.target.value
-                )
+                setDescription(event.target.value)
               }
               rows={4}
+              disabled={loading}
             />
           </label>
 
@@ -183,14 +241,29 @@ function EditMemory({
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(event) =>
-                setImage(
-                  event.target.files?.[0] ||
-                    null
-                )
-              }
+              onChange={handleImageChange}
+              disabled={loading}
             />
           </label>
+
+          {previewUrl && (
+            <div className="add-memory-preview">
+              <img
+                src={previewUrl}
+                alt="Memory preview"
+                onError={(event) => {
+                  event.currentTarget.style.display =
+                    "none";
+                }}
+              />
+            </div>
+          )}
+
+          {status && (
+            <p className="add-memory-status">
+              {status}
+            </p>
+          )}
 
           {error && (
             <p className="add-memory-error">
@@ -204,7 +277,7 @@ function EditMemory({
             className="add-memory-submit"
           >
             {loading
-              ? "Saving changes..."
+              ? status || "Saving..."
               : "Save Changes 💗"}
           </button>
         </form>

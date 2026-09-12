@@ -1,118 +1,73 @@
 import { supabase } from "../lib/supabaseClient";
 
 const MEMORY_BUCKET = "memories";
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
-/*
- * ============================================
- * GET MEMORIES
- * ============================================
- */
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+
+export async function getSignedMemoryImageUrl(imagePath) {
+  if (!imagePath) return null;
+
+  // Keep compatibility with your old Unsplash/static memories.
+  if (imagePath.startsWith("http")) {
+    return imagePath;
+  }
+
+  const { data, error } = await supabase.storage
+    .from(MEMORY_BUCKET)
+    .createSignedUrl(imagePath, 60 * 60);
+
+  if (error) {
+    console.error("Failed to create signed URL:", error);
+    return null;
+  }
+
+  return data.signedUrl;
+}
 
 export async function getMyMemories(universeId) {
   const { data, error } = await supabase
     .from("memories")
     .select("*")
     .eq("universe_id", universeId)
-    .order("memory_date", {
-      ascending: false,
-    });
+    .order("memory_date", { ascending: false });
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  /*
-   * Convert private Storage paths into
-   * temporary signed URLs.
-   *
-   * Existing Unsplash URLs are kept as-is.
-   */
-
-  const memoriesWithImages = await Promise.all(
-    data.map(async (memory) => {
-      if (
-        !memory.image_path ||
-        memory.image_path.startsWith("http")
-      ) {
-        return {
-          ...memory,
-          image_url: memory.image_path,
-        };
-      }
-
-      const { data: signedData, error: signedError } =
-        await supabase.storage
-          .from(MEMORY_BUCKET)
-          .createSignedUrl(
-            memory.image_path,
-            60 * 60
-          );
-
-      if (signedError) {
-        console.error(
-          "Failed to create signed URL:",
-          signedError
-        );
-
-        return {
-          ...memory,
-          image_url: null,
-        };
-      }
-
-      return {
-        ...memory,
-        image_url: signedData.signedUrl,
-      };
-    })
+  return Promise.all(
+    data.map(async (memory) => ({
+      ...memory,
+      image_url: await getSignedMemoryImageUrl(memory.image_path),
+    }))
   );
-
-  return memoriesWithImages;
 }
 
-
-/*
- * ============================================
- * UPLOAD MEMORY PHOTO
- * ============================================
- */
-
-export async function uploadMemoryPhoto(
-  universeId,
-  file
-) {
+export async function uploadMemoryPhoto(universeId, file) {
   if (!file) {
-    throw new Error("No image selected.");
+    throw new Error("Please select an image.");
   }
 
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     throw new Error(
-      "Only JPG, PNG and WebP images are allowed."
+      "Please choose a JPG, PNG or WebP image."
     );
   }
 
-  const maxSize = 10 * 1024 * 1024;
-
-  if (file.size > maxSize) {
+  if (file.size > MAX_IMAGE_SIZE) {
     throw new Error(
-      "The image must be smaller than 10 MB."
+      "This image is too large. Please choose an image smaller than 10 MB."
     );
   }
 
   const extension =
     file.name.split(".").pop()?.toLowerCase() || "jpg";
 
-  const fileName =
-    `${crypto.randomUUID()}.${extension}`;
-
-  const filePath =
-    `${universeId}/${fileName}`;
+  const fileName = `${crypto.randomUUID()}.${extension}`;
+  const filePath = `${universeId}/${fileName}`;
 
   const { error } = await supabase.storage
     .from(MEMORY_BUCKET)
@@ -123,18 +78,30 @@ export async function uploadMemoryPhoto(
     });
 
   if (error) {
-    throw error;
+    throw new Error(
+      error.message || "Unable to upload the image."
+    );
   }
 
   return filePath;
 }
 
+export async function deleteMemoryPhoto(imagePath) {
+  if (!imagePath || imagePath.startsWith("http")) {
+    return;
+  }
 
-/*
- * ============================================
- * CREATE MEMORY
- * ============================================
- */
+  const { error } = await supabase.storage
+    .from(MEMORY_BUCKET)
+    .remove([imagePath]);
+
+  if (error) {
+    console.error(
+      "Failed to remove memory image:",
+      error
+    );
+  }
+}
 
 export async function createMemory({
   universeId,
@@ -155,105 +122,85 @@ export async function createMemory({
     .select()
     .single();
 
-  if (error) throw error;
-
-  let imageUrl = null;
-
-  if (data.image_path) {
-    if (data.image_path.startsWith("http")) {
-      imageUrl = data.image_path;
-    } else {
-      const { data: signedData, error: signedError } =
-        await supabase.storage
-          .from(MEMORY_BUCKET)
-          .createSignedUrl(
-            data.image_path,
-            60 * 60
-          );
-
-      if (signedError) {
-        console.error(
-          "Failed to create signed URL:",
-          signedError
-        );
-      } else {
-        imageUrl = signedData.signedUrl;
-      }
+  if (error) {
+    // If DB creation fails after upload,
+    // don't leave the image orphaned.
+    if (imagePath) {
+      await deleteMemoryPhoto(imagePath);
     }
+
+    throw error;
   }
 
   return {
     ...data,
-    image_url: imageUrl,
+    image_url: await getSignedMemoryImageUrl(
+      data.image_path
+    ),
   };
 }
 
-
-/*
- * ============================================
- * UPDATE MEMORY
- * ============================================
- */
-
-export async function updateMemory(
-  id,
-  updates
-) {
-  const { data, error } = await supabase
-    .from("memories")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-
-/*
- * ============================================
- * DELETE MEMORY
- * ============================================
- */
-
-export async function deleteMemory(id) {
-  const { error } = await supabase
-    .from("memories")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    throw error;
-  }
-}
 export async function updateMemory(id, updates) {
-  const { data, error } = await supabase
-    .from("memories")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return data;
-}
-
-export async function deleteMemory(id) {
-  // First get the memory so we know which Storage file to remove
-  const { data: memory, error: fetchError } = await supabase
-    .from("memories")
-    .select("image_path")
-    .eq("id", id)
-    .single();
+  const { data: currentMemory, error: fetchError } =
+    await supabase
+      .from("memories")
+      .select("image_path")
+      .eq("id", id)
+      .single();
 
   if (fetchError) throw fetchError;
 
-  // Delete the database record
+  const oldImagePath = currentMemory?.image_path;
+  const newImagePath = updates.image_path;
+
+  const { data, error } = await supabase
+    .from("memories")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    // The new image was uploaded but DB update failed.
+    // Remove it so Storage doesn't accumulate orphan files.
+    if (
+      newImagePath &&
+      newImagePath !== oldImagePath
+    ) {
+      await deleteMemoryPhoto(newImagePath);
+    }
+
+    throw error;
+  }
+
+  // Delete the previous uploaded image only after
+  // the DB update succeeded.
+  if (
+    newImagePath &&
+    oldImagePath &&
+    newImagePath !== oldImagePath
+  ) {
+    await deleteMemoryPhoto(oldImagePath);
+  }
+
+  return {
+    ...data,
+    image_url: await getSignedMemoryImageUrl(
+      data.image_path
+    ),
+  };
+}
+
+export async function deleteMemory(id) {
+  const { data: memory, error: fetchError } =
+    await supabase
+      .from("memories")
+      .select("image_path")
+      .eq("id", id)
+      .single();
+
+  if (fetchError) throw fetchError;
+
   const { error: deleteError } = await supabase
     .from("memories")
     .delete()
@@ -261,20 +208,7 @@ export async function deleteMemory(id) {
 
   if (deleteError) throw deleteError;
 
-  // Delete the associated image from Storage
-  if (
-    memory?.image_path &&
-    !memory.image_path.startsWith("http")
-  ) {
-    const { error: storageError } = await supabase.storage
-      .from(MEMORY_BUCKET)
-      .remove([memory.image_path]);
-
-    if (storageError) {
-      console.error(
-        "Memory deleted, but image cleanup failed:",
-        storageError
-      );
-    }
+  if (memory?.image_path) {
+    await deleteMemoryPhoto(memory.image_path);
   }
 }

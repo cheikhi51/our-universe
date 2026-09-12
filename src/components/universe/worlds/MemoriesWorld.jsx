@@ -7,6 +7,7 @@ import {
   getMyMemories,
   deleteMemory,
 } from "../../../services/memoriesService";
+import ConfirmMemoryDelete from "./ConfirmMemoryDelete";
 
 function MemoriesWorld({ onBack }) {
   const [memories, setMemories] = useState([]);
@@ -18,8 +19,9 @@ function MemoriesWorld({ onBack }) {
   const [editingMemory, setEditingMemory] =
   useState(null);
 
-  const [deletingMemoryId, setDeletingMemoryId] =
-  useState(null);
+  const [memoryToDelete, setMemoryToDelete] = useState(null);
+
+  const [deletingMemory, setDeletingMemory] = useState(false);
   /*
    * ============================================
    * LOAD MEMORIES FROM SUPABASE
@@ -160,29 +162,31 @@ function MemoriesWorld({ onBack }) {
     };
   }, [selectedMemory, currentIndex, memories]);
 
-  const handleDeleteMemory = async (memory) => {
-  const confirmed = window.confirm(
-    `Delete "${memory.title}"?\n\nThis memory and its photo will be permanently deleted.`
-  );
-
-  if (!confirmed) return;
+  const handleDeleteMemory = async () => {
+  if (!memoryToDelete) return;
 
   try {
-    setDeletingMemoryId(memory.id);
+    setDeletingMemory(true);
 
-    await deleteMemory(memory.id);
+    await deleteMemory(
+      memoryToDelete.id
+    );
 
     setMemories((currentMemories) =>
       currentMemories.filter(
-        (item) => item.id !== memory.id
+        (memory) =>
+          memory.id !== memoryToDelete.id
       )
     );
 
     if (
-      selectedMemory?.id === memory.id
+      selectedMemory?.id ===
+      memoryToDelete.id
     ) {
       setSelectedMemory(null);
     }
+
+    setMemoryToDelete(null);
   } catch (err) {
     console.error(
       "Failed to delete memory:",
@@ -194,7 +198,7 @@ function MemoriesWorld({ onBack }) {
         "Unable to delete this memory."
     );
   } finally {
-    setDeletingMemoryId(null);
+    setDeletingMemory(false);
   }
 };
 
@@ -472,18 +476,13 @@ function MemoriesWorld({ onBack }) {
 
                 <button
                   type="button"
-                  disabled={
-                    deletingMemoryId ===
-                    selectedMemory.id
-                  }
-                  onClick={() =>
-                    handleDeleteMemory(selectedMemory)
-                  }
+                  onClick={() => {
+                    setMemoryToDelete(
+                      selectedMemory
+                    );
+                  }}
                 >
-                  {deletingMemoryId ===
-                  selectedMemory.id
-                    ? "Deleting..."
-                    : "🗑️ Delete"}
+                  🗑️ Delete
                 </button>
               </div>
 
@@ -547,39 +546,46 @@ function MemoriesWorld({ onBack }) {
               setEditingMemory(null)
             }
             onMemoryUpdated={(updatedMemory) => {
-              const formattedMemory = {
-                id: updatedMemory.id,
-                title: updatedMemory.title,
-                date: updatedMemory.memory_date
-                  ? new Date(
-                      updatedMemory.memory_date
-                    ).toLocaleDateString(
-                      "en-GB",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      }
-                    )
-                  : "",
-                description:
-                  updatedMemory.description || "",
-                image:
-                  updatedMemory.image_url ||
-                  editingMemory.image,
-              };
+            const formattedMemory = {
+              id: updatedMemory.id,
+              title: updatedMemory.title,
+              date: updatedMemory.memory_date
+                ? new Date(
+                    updatedMemory.memory_date
+                  ).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "",
+              description: updatedMemory.description || "",
+              image:
+                updatedMemory.image_url ||
+                editingMemory?.image ||
+                "",
+            };
 
-              setMemories(
-                (currentMemories) =>
-                  currentMemories.map((item) =>
-                    item.id === formattedMemory.id
-                      ? formattedMemory
-                      : item
-                  )
-              );
+            setMemories((currentMemories) =>
+              currentMemories.map((memory) =>
+                memory.id === formattedMemory.id
+                  ? formattedMemory
+                  : memory
+              )
+            );
 
-              setEditingMemory(null);
-            }}
+            setEditingMemory(null);
+          }}
+          />
+        )}
+
+        {memoryToDelete && (
+          <ConfirmMemoryDelete
+            memory={memoryToDelete}
+            loading={deletingMemory}
+            onCancel={() =>
+              setMemoryToDelete(null)
+            }
+            onConfirm={handleDeleteMemory}
           />
         )}
 
