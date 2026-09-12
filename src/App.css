@@ -9075,3 +9075,422 @@ button {
   }
 
 }
+/* ============================================
+   ADD MEMORY OVERLAY
+============================================ */
+.memories-add-button{
+  position: fixed;
+  z-index: 99999;
+  top: 22px;
+  right: 22px;
+
+  min-width: 100px;
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12%;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 120, 190, 0.25),
+      rgba(100, 40, 130, 0.15)
+    );
+
+  border:
+    1px solid
+      rgba(255, 255, 255, 0.08);
+
+  color: white;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+.add-memory-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(120, 70, 140, 0.22),
+      transparent 45%
+    ),
+    rgba(5, 4, 15, 0.82);
+
+  backdrop-filter: blur(14px);
+
+  overflow-y: auto;
+}
+
+
+/* ============================================
+   ADD MEMORY CARD
+============================================ */
+
+.add-memory-card {
+  position: relative;
+
+  width: min(560px, 100%);
+
+  max-height: calc(100vh - 48px);
+
+  overflow-y: auto;
+
+  padding: 36px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(35, 25, 50, 0.96),
+      rgba(12, 10, 24, 0.98)
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    0 0 60px rgba(180, 100, 220, 0.12);
+
+  color: white;
+
+  animation: addMemoryAppear 0.35s ease;
+}
+
+
+@keyframes addMemoryAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* ============================================
+   CLOSE BUTTON
+============================================ */
+
+.add-memory-close {
+  position: absolute;
+
+  top: 16px;
+  right: 18px;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 26px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.add-memory-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(90deg);
+}
+
+
+/* ============================================
+   HEADER
+============================================ */
+
+.add-memory-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  margin-bottom: 30px;
+}
+
+.add-memory-header > span {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  font-size: 28px;
+}
+
+.add-memory-header p {
+  margin: 0 0 5px;
+
+  font-size: 11px;
+  letter-spacing: 0.2em;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.add-memory-header h2 {
+  margin: 0 0 5px;
+
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.add-memory-header div > span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+
+/* ============================================
+   FORM
+============================================ */
+
+.add-memory-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-memory-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  font-size: 13px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.add-memory-form input,
+.add-memory-form textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.055);
+
+  color: white;
+
+  font-family: inherit;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.add-memory-form input:focus,
+.add-memory-form textarea:focus {
+  border-color: rgba(255, 180, 220, 0.45);
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.add-memory-form textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.add-memory-form input::placeholder,
+.add-memory-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* ============================================
+   FILE INPUT
+============================================ */
+
+.add-memory-file {
+  position: relative;
+
+  min-height: 90px;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  cursor: pointer;
+
+  text-align: center;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.add-memory-file:hover {
+  border-color: rgba(255, 180, 220, 0.4);
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.add-memory-file input {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+
+  cursor: pointer;
+}
+
+.add-memory-file span {
+  pointer-events: none;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 14px;
+}
+
+
+/* ============================================
+   ERROR
+============================================ */
+
+.add-memory-error {
+  margin: 0;
+
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  background: rgba(255, 80, 100, 0.08);
+
+  border: 1px solid rgba(255, 80, 100, 0.18);
+
+  color: #ff9aaa;
+
+  font-size: 13px;
+}
+
+
+/* ============================================
+   SUBMIT
+============================================ */
+
+.add-memory-submit {
+  width: 100%;
+
+  padding: 14px 20px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(220, 130, 190, 0.9),
+    rgba(160, 100, 200, 0.9)
+  );
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px rgba(180, 100, 200, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.add-memory-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 35px rgba(180, 100, 200, 0.3);
+}
+
+.add-memory-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.memory-viewer-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.memory-viewer-actions button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.memory-viewer-actions button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 180, 220, 0.3);
+  transform: translateY(-1px);
+}
+
+.memory-viewer-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
