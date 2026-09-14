@@ -1,8 +1,173 @@
 import { useEffect, useState } from "react";
-import { timelineEvents } from "../../../data/timeline";
+import { getMyUniverse } from "../../../services/universeService";
+import { getMyTimeline,deleteTimelineEvent } from "../../../services/timelineService";
+
+import AddChapter from "./AddChapter";
+import EditChapter from "./EditChapter";
+import ConfirmChapterDelete from "./ConfirmChapterDelete";
 
 function TimelineWorld({ onBack }) {
+
+  const [timelineEvents, setTimelineEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showAddChapter, setShowAddChapter] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [deletingEvent, setDeletingEvent] = useState(false);
+
+  {/* Loading timeline */}
+  useEffect(() => {
+  let mounted = true;
+
+  async function loadTimeline() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const universeMembership =
+        await getMyUniverse();
+
+      const universeId =
+        universeMembership?.universes?.id;
+
+      if (!universeId) {
+        throw new Error(
+          "No universe found for this account."
+        );
+      }
+
+      console.log(
+        "🌌 Current universe ID:",
+        universeId
+      );
+
+      const data =
+        await getMyTimeline(universeId);
+
+      console.log(
+        "🗓️ Timeline returned from Supabase:",
+        data
+      );
+
+      if (!mounted) return;
+
+      const formattedEvents = data.map(formatTimelineEvent);
+      setTimelineEvents(formattedEvents);
+    } catch (err) {
+      console.error(
+        "Failed to load timeline:",
+        err
+      );
+
+      if (mounted) {
+        setError(
+          err.message ||
+            "Unable to load our timeline."
+        );
+      }
+    } finally {
+      if (mounted) {
+        setLoading(false);
+      }
+    }
+  }
+
+  loadTimeline();
+
+  return () => {
+    mounted = false;
+  };
+}, []);
+    {/*Delete handler*/}
+    const handleDeleteChapter = async () => {
+  if (!eventToDelete) {
+    return;
+  }
+
+  try {
+    setDeletingEvent(true);
+
+    await deleteTimelineEvent(
+      eventToDelete.id
+    );
+
+    setTimelineEvents(
+      (currentEvents) =>
+        currentEvents.filter(
+          (event) =>
+            event.id !== eventToDelete.id
+        )
+    );
+
+    if (
+      selectedEvent?.id ===
+      eventToDelete.id
+    ) {
+      setSelectedEvent(null);
+    }
+
+    setEventToDelete(null);
+  } catch (err) {
+    console.error(
+      "Failed to delete chapter:",
+      err
+    );
+
+    alert(
+      err.message ||
+        "Unable to delete this chapter."
+    );
+  } finally {
+    setDeletingEvent(false);
+  }
+};
+
+    {/* Format timeline event */}
+    const formatTimelineEvent = (event) => {
+      const date = event.event_date
+        ? new Date(
+            `${event.event_date}T00:00:00`
+          )
+        : null;
+
+      return {
+        id: event.id,
+
+        event_date: event.event_date,
+
+        date: date
+          ? date.toLocaleDateString(
+              "en-GB",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }
+            )
+          : "",
+
+        year: date
+          ? date.getFullYear().toString()
+          : "",
+
+        title: event.title,
+
+        description:
+          event.description || "",
+
+        icon:
+          event.icon || "✨",
+
+        location:
+          event.location || "",
+
+        favorite:
+          event.favorite ?? false,
+      };
+    };
+
 
   const openEvent = (event) => {
     setSelectedEvent(event);
@@ -14,17 +179,87 @@ function TimelineWorld({ onBack }) {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        closeEvent();
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      if (eventToDelete) {
+        setEventToDelete(null);
+        return;
+      }
+
+      if (editingEvent) {
+        setEditingEvent(null);
+        return;
+      }
+
+      if (showAddChapter) {
+        setShowAddChapter(false);
+        return;
+      }
+
+      if (selectedEvent) {
+        setSelectedEvent(null);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
-  }, []);
+  }, [
+    selectedEvent,
+    editingEvent,
+    eventToDelete,
+    showAddChapter,
+  ]);
+
+    if (loading) {
+      return (
+        <main className="timeline-world">
+          <div className="timeline-stars timeline-stars-one" />
+          <div className="timeline-stars timeline-stars-two" />
+          <div className="timeline-stars timeline-stars-three" />
+
+          <div className="timeline-nebula timeline-nebula-one" />
+          <div className="timeline-nebula timeline-nebula-two" />
+
+          <div className="timeline-loading">
+            <span>🗓️</span>
+            <p>Opening our story...</p>
+          </div>
+        </main>
+      );
+    }
+
+    if (error) {
+      return (
+        <main className="timeline-world">
+          <div className="timeline-stars timeline-stars-one" />
+          <div className="timeline-stars timeline-stars-two" />
+          <div className="timeline-stars timeline-stars-three" />
+
+          <div className="timeline-nebula timeline-nebula-one" />
+          <div className="timeline-nebula timeline-nebula-two" />
+
+          <div className="timeline-loading">
+            <span>🌙</span>
+            <p>{error}</p>
+
+            <button onClick={onBack}>
+              Back to Universe
+            </button>
+          </div>
+        </main>
+      );
+    }
 
   return (
     <main className="timeline-world">
@@ -47,6 +282,15 @@ function TimelineWorld({ onBack }) {
         >
           <span>←</span>
           <span>Back to Universe</span>
+        </button>
+        <button
+          className="timeline-add-button"
+          onClick={() =>
+            setShowAddChapter(true)
+          }
+        >
+          <span>+</span>
+          <span>Add Chapter</span>
         </button>
 
         <div className="timeline-title">
@@ -247,6 +491,29 @@ function TimelineWorld({ onBack }) {
                 (event) => event.id === selectedEvent.id
               ) + 1}
               {" / "}
+              <div className="timeline-viewer-actions">
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingEvent(selectedEvent);
+                    setSelectedEvent(null);
+                  }}
+                >
+                  ✏️ Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEventToDelete(selectedEvent);
+                  }}
+                >
+                  🗑️ Delete
+                </button>
+
+              </div>
+
               {timelineEvents.length}
             </div>
 
@@ -254,6 +521,87 @@ function TimelineWorld({ onBack }) {
 
         </div>
       )}
+      {showAddChapter && (
+      <AddChapter
+        onClose={() =>
+          setShowAddChapter(false)
+        }
+        onChapterCreated={(createdEvent) => {
+          const formattedEvent =
+            formatTimelineEvent(
+              createdEvent
+            );
+
+          setTimelineEvents(
+            (currentEvents) =>
+              [
+                ...currentEvents,
+                formattedEvent,
+              ].sort(
+                (a, b) =>
+                  new Date(
+                    a.event_date
+                  ) -
+                  new Date(
+                    b.event_date
+                  )
+              )
+          );
+
+          setShowAddChapter(false);
+        }}
+      />
+    )}
+
+    {editingEvent && (
+      <EditChapter
+        event={editingEvent}
+        onClose={() =>
+          setEditingEvent(null)
+        }
+        onChapterUpdated={(updatedEvent) => {
+          const formattedEvent =
+            formatTimelineEvent(
+              updatedEvent
+            );
+
+          setTimelineEvents(
+            (currentEvents) =>
+              currentEvents
+                .map((event) =>
+                  event.id ===
+                  formattedEvent.id
+                    ? formattedEvent
+                    : event
+                )
+                .sort(
+                  (a, b) =>
+                    new Date(
+                      a.event_date
+                    ) -
+                    new Date(
+                      b.event_date
+                    )
+                )
+          );
+
+          setEditingEvent(null);
+        }}
+      />
+    )}
+
+    {eventToDelete && (
+      <ConfirmChapterDelete
+        event={eventToDelete}
+        loading={deletingEvent}
+        onCancel={() =>
+          setEventToDelete(null)
+        }
+        onConfirm={
+          handleDeleteChapter
+        }
+      />
+    )}
 
     </main>
   );
