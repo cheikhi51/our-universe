@@ -3,17 +3,34 @@ import { useEffect, useRef, useState } from "react";
 const SPOTIFY_PLAYLIST_URL =
   "https://open.spotify.com/playlist/7ddBs9pW4Tmm9XuMkqVofw";
 
-function SpotifyPlaylist() {
+const SPOTIFY_PLAYLIST_URI =
+  "spotify:playlist:7ddBs9pW4Tmm9XuMkqVofw";
+
+function SpotifyPlaylist({
+  selectedTrack = null,
+}) {
   const embedRef = useRef(null);
   const controllerRef = useRef(null);
 
-  const [spotifyReady, setSpotifyReady] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [spotifyReady, setSpotifyReady] =
+    useState(false);
+
+  const [isPlaying, setIsPlaying] =
+    useState(false);
+
+  const [isTrackMode, setIsTrackMode] =
+    useState(false);
+
+  /* =================================
+     INITIALIZE SPOTIFY
+  ================================= */
 
   useEffect(() => {
     let mounted = true;
 
-    const initializeSpotify = (IFrameAPI) => {
+    const initializeSpotify = (
+      IFrameAPI
+    ) => {
       if (!embedRef.current) return;
 
       if (controllerRef.current) return;
@@ -59,22 +76,23 @@ function SpotifyPlaylist() {
               }
             }
           );
+
+          EmbedController.addListener(
+            "playback_error",
+            () => {
+              setIsPlaying(false);
+            }
+          );
         }
       );
     };
 
-    /*
-     * Spotify API already loaded
-     */
     if (window.SpotifyIframeApi) {
       initializeSpotify(
         window.SpotifyIframeApi
       );
     }
 
-    /*
-     * Spotify API ready callback
-     */
     const previousCallback =
       window.onSpotifyIframeApiReady;
 
@@ -83,16 +101,15 @@ function SpotifyPlaylist() {
         window.SpotifyIframeApi =
           IFrameAPI;
 
-        initializeSpotify(IFrameAPI);
+        initializeSpotify(
+          IFrameAPI
+        );
 
         if (previousCallback) {
           previousCallback(IFrameAPI);
         }
       };
 
-    /*
-     * Load Spotify iFrame API
-     */
     const existingScript =
       document.querySelector(
         'script[src="https://open.spotify.com/embed/iframe-api/v1"]'
@@ -115,10 +132,53 @@ function SpotifyPlaylist() {
 
       if (controllerRef.current) {
         controllerRef.current.destroy();
+
         controllerRef.current = null;
       }
     };
   }, []);
+
+  /* =================================
+     LOAD SELECTED TRACK
+  ================================= */
+
+  useEffect(() => {
+    const controller =
+      controllerRef.current;
+
+    if (
+      !controller ||
+      !spotifyReady
+    ) {
+      return;
+    }
+
+    if (!selectedTrack?.spotifyId) {
+      return;
+    }
+
+    const trackUri =
+      `spotify:track:${selectedTrack.spotifyId}`;
+
+    try {
+      controller.loadUri(trackUri);
+
+      setIsTrackMode(true);
+      setIsPlaying(false);
+    } catch (err) {
+      console.error(
+        "❌ Failed to load Spotify track:",
+        err
+      );
+    }
+  }, [
+    selectedTrack,
+    spotifyReady,
+  ]);
+
+  /* =================================
+     PLAY / PAUSE
+  ================================= */
 
   const togglePlayback = () => {
     const controller =
@@ -129,8 +189,39 @@ function SpotifyPlaylist() {
     controller.togglePlay();
   };
 
+  /* =================================
+     RETURN TO PLAYLIST
+  ================================= */
+
+  const returnToPlaylist = () => {
+    const controller =
+      controllerRef.current;
+
+    if (!controller) return;
+
+    try {
+      controller.loadUri(
+        SPOTIFY_PLAYLIST_URI
+      );
+
+      setIsTrackMode(false);
+      setIsPlaying(false);
+    } catch (err) {
+      console.error(
+        "❌ Failed to return to Spotify playlist:",
+        err
+      );
+    }
+  };
+
   return (
-    <section className="spotify-section">
+    <section
+      className={`spotify-section ${
+        isTrackMode
+          ? "spotify-track-mode"
+          : ""
+      }`}
+    >
 
       {/* =================================
           HEADER
@@ -141,28 +232,34 @@ function SpotifyPlaylist() {
         <div>
 
           <span className="spotify-eyebrow">
-            OUR SOUNDTRACK
+            {isTrackMode
+              ? "NOW PLAYING"
+              : "OUR SOUNDTRACK"}
           </span>
 
           <h2>
-            Our Spotify Universe
+            {selectedTrack
+              ? selectedTrack.title
+              : "Our Spotify Universe"}
           </h2>
 
           <p>
-            The songs that sound like us.
+            {selectedTrack
+              ? selectedTrack.artist
+              : "The songs that sound like us."}
           </p>
 
         </div>
 
         <div className="spotify-icon">
-          🎧
+          {selectedTrack?.icon ||
+            "🎧"}
         </div>
 
       </div>
 
-
       {/* =================================
-          CUSTOM PLAYER HEADER
+          CUSTOM PLAYER
       ================================= */}
 
       <div className="spotify-custom-player">
@@ -170,27 +267,33 @@ function SpotifyPlaylist() {
         <div className="spotify-player-info">
 
           <div className="spotify-player-art">
-            💗
+            {selectedTrack?.icon ||
+              "💗"}
           </div>
 
           <div>
 
             <span>
-              NOW PLAYING
+              {isTrackMode
+                ? "PLAYING FROM SPOTIFY"
+                : "OUR PLAYLIST"}
             </span>
 
             <strong>
-              Our Spotify Playlist
+              {selectedTrack
+                ? selectedTrack.title
+                : "Our Spotify Playlist"}
             </strong>
 
             <small>
-              Tap a song below to listen
+              {selectedTrack
+                ? selectedTrack.artist
+                : "The soundtrack of our universe"}
             </small>
 
           </div>
 
         </div>
-
 
         <button
           className="spotify-main-play"
@@ -202,11 +305,12 @@ function SpotifyPlaylist() {
               : "Play Spotify"
           }
         >
-          {isPlaying ? "❚❚" : "▶"}
+          {isPlaying
+            ? "❚❚"
+            : "▶"}
         </button>
 
       </div>
-
 
       {/* =================================
           SPOTIFY EMBED
@@ -221,29 +325,55 @@ function SpotifyPlaylist() {
 
       </div>
 
-
       {/* =================================
-          OPEN SPOTIFY
+          PLAYER ACTIONS
       ================================= */}
 
-      <a
-        className="spotify-open-link"
-        href={SPOTIFY_PLAYLIST_URL}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <span>
-          Open full playlist in Spotify
-        </span>
+      <div className="spotify-player-actions">
 
-        <span>
-          ↗
-        </span>
-      </a>
+        {isTrackMode ? (
+          <button
+            type="button"
+            className="spotify-back-playlist"
+            onClick={
+              returnToPlaylist
+            }
+          >
+            <span>←</span>
+
+            <span>
+              Back to our playlist
+            </span>
+          </button>
+        ) : (
+          <span className="spotify-player-hint">
+            Select a song from our soundtrack
+          </span>
+        )}
+
+        <a
+          className="spotify-open-link"
+          href={
+            selectedTrack?.spotifyId
+              ? `https://open.spotify.com/track/${selectedTrack.spotifyId}`
+              : SPOTIFY_PLAYLIST_URL
+          }
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span>
+            {selectedTrack?.spotifyId
+              ? "Open in Spotify"
+              : "Open full playlist"}
+          </span>
+
+          <span>↗</span>
+        </a>
+
+      </div>
 
     </section>
   );
 }
 
 export default SpotifyPlaylist;
-

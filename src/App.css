@@ -11196,3 +11196,1411 @@ button {
 .chapter-form::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 180, 220, 0.45);
 }
+
+/* =================================
+   MUSIC MANAGEMENT
+================================= */
+
+.music-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.music-list-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.music-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 9px 15px;
+
+  border: 1px solid rgba(255, 190, 225, 0.2);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 235, 245, 0.9);
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.music-add-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 190, 225, 0.4);
+  transform: translateY(-1px);
+}
+
+.music-add-button span:first-child {
+  font-size: 18px;
+}
+
+/* =================================
+   TRACK ROW
+================================= */
+
+.music-track-row {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  border-radius: 14px;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.music-track-row:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.music-track-row-active {
+  background: rgba(255, 180, 220, 0.06);
+}
+
+.music-track-main {
+  flex: 1;
+
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns:
+    35px
+    42px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+  gap: 12px;
+
+  padding: 13px 8px 13px 12px;
+
+  border: none;
+  background: transparent;
+
+  color: inherit;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.music-track-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  padding-right: 10px;
+}
+
+.music-track-action {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.music-track-action:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.07);
+  transform: scale(1.05);
+}
+
+.music-track-action-favorite {
+  color: #ff9bc4;
+}
+
+.music-track-action-delete:hover {
+  color: #ff829f;
+}
+
+/* =================================
+   FORM OVERLAY
+================================= */
+
+.music-form-overlay,
+.music-delete-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(3, 5, 18, 0.78);
+
+  backdrop-filter: blur(12px);
+}
+
+/* =================================
+   FORM
+================================= */
+
+.music-form {
+  width: min(620px, 100%);
+  max-height: min(720px, 90vh);
+
+  overflow-y: auto;
+
+  padding: 26px;
+
+  border: 1px solid rgba(255, 190, 225, 0.15);
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24, 20, 48, 0.97),
+      rgba(9, 12, 30, 0.97)
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(180, 100, 180, 0.08);
+}
+
+.music-form::-webkit-scrollbar {
+  width: 5px;
+}
+
+.music-form::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.music-form::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 180, 220, 0.25);
+}
+
+.music-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+}
+
+.music-form-eyebrow,
+.music-delete-eyebrow {
+  font-size: 10px;
+  letter-spacing: 2px;
+
+  color: rgba(255, 180, 220, 0.55);
+}
+
+.music-form h2,
+.music-delete-modal h2 {
+  margin: 5px 0 0;
+
+  color: white;
+  font-size: 24px;
+}
+
+.music-form-close {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+.music-form-close:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.music-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.music-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  margin-bottom: 15px;
+}
+
+.music-form label > span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.music-form input,
+.music-form textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 11px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.045);
+  color: white;
+
+  font: inherit;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.music-form textarea {
+  resize: vertical;
+}
+
+.music-form input:focus,
+.music-form textarea:focus {
+  border-color: rgba(255, 180, 220, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.music-form input::placeholder,
+.music-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.music-form-favorite {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 9px !important;
+}
+
+.music-form-favorite input {
+  width: auto;
+}
+
+.music-form-favorite span {
+  color: rgba(255, 220, 235, 0.75) !important;
+}
+
+.music-form-actions,
+.music-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 10px;
+}
+
+.music-form-cancel,
+.music-form-submit,
+.music-delete-cancel,
+.music-delete-confirm {
+  padding: 10px 18px;
+
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  font: inherit;
+}
+
+.music-form-cancel,
+.music-delete-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.music-form-submit {
+  border: 1px solid rgba(255, 180, 220, 0.25);
+
+  background: rgba(255, 150, 200, 0.12);
+  color: #ffd8e8;
+}
+
+.music-form-submit:hover {
+  background: rgba(255, 150, 200, 0.2);
+}
+
+/* =================================
+   DELETE MODAL
+================================= */
+
+.music-delete-modal {
+  width: min(430px, 100%);
+
+  padding: 30px;
+
+  border: 1px solid rgba(255, 190, 225, 0.12);
+  border-radius: 22px;
+
+  background: rgba(15, 16, 37, 0.98);
+
+  text-align: center;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.music-delete-icon {
+  font-size: 30px;
+  margin-bottom: 12px;
+}
+
+.music-delete-modal p {
+  margin: 14px 0 24px;
+
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+}
+
+.music-delete-modal strong {
+  color: rgba(255, 220, 235, 0.9);
+}
+
+.music-delete-actions {
+  justify-content: center;
+}
+
+.music-delete-confirm {
+  border: 1px solid rgba(255, 100, 140, 0.25);
+
+  background: rgba(255, 80, 120, 0.12);
+  color: #ffb5c9;
+}
+
+.music-delete-confirm:hover {
+  background: rgba(255, 80, 120, 0.2);
+}
+
+/* =================================
+   MOBILE
+================================= */
+
+@media (max-width: 650px) {
+  .music-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .music-track-main {
+    grid-template-columns:
+      28px
+      36px
+      minmax(0, 1fr);
+  }
+
+  .music-track-duration {
+    display: none;
+  }
+
+  .music-track-actions {
+    padding-right: 5px;
+  }
+
+  .music-track-action {
+    width: 29px;
+    height: 29px;
+  }
+
+  .music-add-button span:last-child {
+    display: none;
+  }
+
+  .music-form {
+    padding: 20px;
+  }
+}
+/* =================================
+   MUSIC TOOLBAR
+================================= */
+
+.music-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 18px;
+}
+
+.music-search {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.music-search:focus-within {
+  border-color: rgba(255, 120, 170, 0.35);
+
+  background: rgba(255, 255, 255, 0.055);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 120, 170, 0.05);
+}
+
+.music-search > span {
+  font-size: 20px;
+  opacity: 0.55;
+}
+
+.music-search input {
+  flex: 1;
+
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: inherit;
+
+  font-size: 14px;
+}
+
+.music-search input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.music-search button {
+  border: none;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  cursor: pointer;
+
+  font-size: 18px;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.music-search button:hover {
+  color: white;
+  transform: scale(1.1);
+}
+
+
+/* =================================
+   FAVORITE FILTER
+================================= */
+
+.music-filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: rgba(255, 255, 255, 0.72);
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.music-filter-button:hover {
+  background: rgba(255, 255, 255, 0.065);
+
+  border-color: rgba(255, 120, 170, 0.25);
+
+  transform: translateY(-1px);
+}
+
+.music-filter-button > span:first-child {
+  font-size: 17px;
+}
+
+.music-filter-button small {
+  min-width: 20px;
+
+  padding: 2px 6px;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  font-size: 11px;
+}
+
+.music-filter-active {
+  color: #ff8db7;
+
+  border-color: rgba(255, 120, 170, 0.35);
+
+  background: rgba(255, 100, 160, 0.08);
+}
+
+
+/* =================================
+   TRACK ROW
+================================= */
+
+.music-track-row {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 9px 10px;
+
+  border: 1px solid transparent;
+
+  border-radius: 16px;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.music-track-row:hover {
+  background: rgba(255, 255, 255, 0.035);
+
+  border-color: rgba(255, 255, 255, 0.07);
+
+  transform: translateX(2px);
+}
+
+.music-track-row-selected {
+  background: rgba(255, 100, 160, 0.055);
+
+  border-color: rgba(255, 120, 170, 0.2);
+}
+
+
+/* =================================
+   TRACK MAIN
+================================= */
+
+.music-track-main {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 7px;
+
+  border: none;
+  background: transparent;
+
+  color: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.music-track-number {
+  width: 28px;
+
+  color: rgba(255, 255, 255, 0.3);
+
+  font-size: 11px;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.music-track-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 110, 165, 0.14),
+      rgba(160, 110, 255, 0.12)
+    );
+
+  font-size: 19px;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.music-track-row:hover
+.music-track-icon {
+  transform: scale(1.06);
+
+  box-shadow:
+    0 6px 20px rgba(255, 100, 170, 0.12);
+}
+
+.music-track-info {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.music-track-info strong {
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.music-track-info small {
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.42);
+
+  font-size: 12px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.music-track-duration {
+  width: 45px;
+
+  color: rgba(255, 255, 255, 0.38);
+
+  font-size: 12px;
+
+  text-align: right;
+}
+
+
+/* =================================
+   SPOTIFY BADGE
+================================= */
+
+.music-spotify-badge {
+  display: grid;
+  place-items: center;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  background: rgba(100, 220, 140, 0.1);
+
+  color: rgba(130, 240, 165, 0.85);
+
+  font-size: 12px;
+}
+
+
+/* =================================
+   TRACK ACTIONS
+================================= */
+
+.music-track-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.music-track-action {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.music-track-action:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.85);
+
+  transform: translateY(-1px);
+}
+
+.music-track-action-favorite {
+  color: #ff7eac;
+}
+
+.music-track-action-favorite:hover {
+  color: #ff9cbe;
+
+  background: rgba(255, 100, 160, 0.1);
+}
+
+.music-track-action-delete:hover {
+  color: #ff7474;
+
+  background: rgba(255, 70, 70, 0.08);
+}
+
+
+/* =================================
+   SELECTED TRACK
+================================= */
+
+.music-selected-track {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  margin-top: 25px;
+
+  padding: 17px 18px;
+
+  border: 1px solid rgba(255, 120, 170, 0.16);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 100, 160, 0.07),
+      rgba(130, 90, 220, 0.045)
+    );
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.music-selected-art {
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 120, 170, 0.18),
+      rgba(140, 100, 240, 0.16)
+    );
+
+  font-size: 23px;
+}
+
+.music-selected-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-selected-info > span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: rgba(255, 130, 180, 0.75);
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.15em;
+}
+
+.music-selected-info h3 {
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  font-size: 15px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.music-selected-info p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.48);
+
+  font-size: 12px;
+}
+
+.music-selected-info small {
+  display: block;
+
+  margin-top: 7px;
+
+  color: rgba(255, 255, 255, 0.38);
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.music-selected-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.music-selected-spotify {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 9px 12px;
+
+  border: 1px solid rgba(120, 230, 150, 0.15);
+  border-radius: 11px;
+
+  background: rgba(100, 220, 140, 0.07);
+
+  color: rgba(150, 245, 175, 0.85);
+
+  text-decoration: none;
+
+  font-size: 11px;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.music-selected-spotify:hover {
+  background: rgba(100, 220, 140, 0.12);
+
+  border-color: rgba(120, 230, 150, 0.3);
+}
+
+.music-no-spotify {
+  color: rgba(255, 255, 255, 0.3);
+
+  font-size: 10px;
+}
+
+.music-selected-close {
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border: none;
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: rgba(255, 255, 255, 0.45);
+
+  cursor: pointer;
+
+  font-size: 18px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.music-selected-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+}
+
+
+/* =================================
+   EMPTY STATE
+================================= */
+
+.music-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 55px 20px;
+
+  text-align: center;
+
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.music-empty > span {
+  margin-bottom: 12px;
+
+  font-size: 34px;
+
+  opacity: 0.7;
+}
+
+.music-empty h3 {
+  margin: 0 0 8px;
+
+  font-size: 16px;
+}
+
+.music-empty p {
+  max-width: 360px;
+
+  margin: 0 0 20px;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+
+/* =================================
+   RESPONSIVE
+================================= */
+
+@media (max-width: 700px) {
+
+  .music-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .music-filter-button {
+    justify-content: center;
+  }
+
+  .music-track-row {
+    padding: 8px 5px;
+  }
+
+  .music-track-main {
+    gap: 9px;
+  }
+
+  .music-track-number {
+    display: none;
+  }
+
+  .music-track-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 17px;
+  }
+
+  .music-track-duration {
+    display: none;
+  }
+
+  .music-track-actions {
+    gap: 1px;
+  }
+
+  .music-track-action {
+    width: 30px;
+    height: 30px;
+  }
+
+  .music-spotify-badge {
+    display: none;
+  }
+
+  .music-selected-track {
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+  .music-selected-info {
+    min-width: calc(100% - 70px);
+  }
+
+  .music-selected-actions {
+    width: 100%;
+
+    margin-top: 5px;
+  }
+
+  .music-selected-spotify {
+    flex: 1;
+
+    justify-content: center;
+  }
+
+  .music-selected-close {
+    flex-shrink: 0;
+  }
+}
+/* =================================
+   FINAL SPOTIFY PLAYER POLISH
+================================= */
+
+.spotify-section {
+  position: relative;
+
+  margin-top: 30px;
+
+  padding: 24px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  overflow: hidden;
+
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+
+.spotify-section::before {
+  content: "";
+
+  position: absolute;
+
+  width: 240px;
+  height: 240px;
+
+  top: -150px;
+  right: -100px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 100, 170, 0.08);
+
+  filter: blur(60px);
+
+  pointer-events: none;
+}
+
+.spotify-track-mode {
+  border-color: rgba(255, 120, 170, 0.18);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 100, 160, 0.06),
+      rgba(120, 90, 220, 0.035)
+    );
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.16);
+}
+
+
+/* =================================
+   SPOTIFY PLAYER ACTIONS
+================================= */
+
+.spotify-player-actions {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-top: 12px;
+}
+
+.spotify-player-hint {
+  color: rgba(255, 255, 255, 0.32);
+
+  font-size: 11px;
+}
+
+.spotify-back-playlist {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: rgba(255, 255, 255, 0.58);
+
+  cursor: pointer;
+
+  font-size: 11px;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.spotify-back-playlist:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.14);
+
+  color: white;
+
+  transform: translateX(-2px);
+}
+
+
+/* =================================
+   IMPROVED OPEN LINK
+================================= */
+
+.spotify-player-actions
+.spotify-open-link {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 13px;
+
+  border-radius: 11px;
+
+  text-decoration: none;
+
+  font-size: 11px;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.spotify-player-actions
+.spotify-open-link:hover {
+  transform: translateY(-1px);
+}
+
+
+/* =================================
+   SELECTED TRACK CONNECTION
+================================= */
+
+.music-selected-track
++ .spotify-section {
+  margin-top: 18px;
+}
+
+.music-selected-track {
+  position: relative;
+
+  border-color: rgba(255, 120, 170, 0.2);
+}
+
+.music-selected-track::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+
+  bottom: -19px;
+
+  width: 1px;
+  height: 18px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 120, 170, 0.3),
+      transparent
+    );
+}
+
+
+/* =================================
+   SPOTIFY EMBED
+================================= */
+
+.spotify-embed {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+  margin-top: 15px;
+
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.spotify-iframe-container {
+  min-height: 180px;
+
+  transition:
+    opacity 0.3s ease;
+}
+
+
+/* =================================
+   PLAYER ART POLISH
+================================= */
+
+.spotify-player-art {
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.spotify-track-mode
+.spotify-player-art {
+  box-shadow:
+    0 8px 25px rgba(255, 100, 170, 0.15);
+
+  animation:
+    spotify-art-pulse 3s ease-in-out infinite;
+}
+
+@keyframes spotify-art-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+
+/* =================================
+   MOBILE
+================================= */
+
+@media (max-width: 700px) {
+
+  .spotify-section {
+    padding: 17px;
+
+    border-radius: 19px;
+  }
+
+  .spotify-player-actions {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .spotify-back-playlist {
+    justify-content: center;
+  }
+
+  .spotify-player-actions
+  .spotify-open-link {
+    justify-content: center;
+  }
+
+  .spotify-player-hint {
+    text-align: center;
+  }
+}
