@@ -574,7 +574,7 @@ function Universe() {
         </span>
 
         <span>
-          Made for Naya and Cheiko
+          Made for cute couples
         </span>
 
         <span>
