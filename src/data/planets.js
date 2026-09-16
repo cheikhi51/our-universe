@@ -5,7 +5,6 @@ export const planets = [
     icon: "📸",
     type: "planet",
     description: "The moments we never want to forget.",
-    stats: "128 memories",
     position: "top-left",
   },
   {
@@ -14,7 +13,6 @@ export const planets = [
     icon: "💌",
     type: "moon",
     description: "Words that belong only to us.",
-    stats: "12 unread messages",
     position: "bottom-left",
   },
   {
@@ -23,7 +21,6 @@ export const planets = [
     icon: "🗓️",
     type: "planet",
     description: "Every chapter of our story.",
-    stats: "24 moments",
     position: "top",
   },
   {
@@ -32,7 +29,6 @@ export const planets = [
     icon: "🎵",
     type: "planet",
     description: "The soundtrack of our universe.",
-    stats: "32 songs",
     position: "top-right",
   },
   {
@@ -41,7 +37,6 @@ export const planets = [
     icon: "✨",
     type: "planet",
     description: "The little things that became special.",
-    stats: "47 special moments",
     position: "bottom-right",
   },
   {
@@ -50,7 +45,6 @@ export const planets = [
     icon: "🌙",
     type: "moon",
     description: "The dreams and future we are building together.",
-    stats: "8 dreams",
     position: "bottom",
   },
 ];

@@ -3,6 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import SpotifyPlaylist from "../SpotifyPlaylist";
 
 import {
+  getMySpotifySettings,
+} from "../../../services/spotifyService";
+
+import {
   getMyMusic,
   createMusicTrack,
   updateMusicTrack,
@@ -66,6 +70,8 @@ function MusicWorld({ onBack }) {
   const [selectedTrack, setSelectedTrack] =
     useState(null);
 
+    const [ spotifySettings, setSpotifySettings] = useState(null);
+
   /* =================================
      LOAD MUSIC
   ================================= */
@@ -90,13 +96,22 @@ function MusicWorld({ onBack }) {
           );
         }
 
-        const tracks =
-          await getMyMusic(universeId);
+        const [
+          tracks,
+          spotify,
+        ] = await Promise.all([
+          getMyMusic(universeId),
+          getMySpotifySettings(),
+        ]);
 
         if (!mounted) return;
 
         setMusicTracks(
           tracks.map(formatMusicTrack)
+        );
+
+        setSpotifySettings(
+          spotify
         );
       } catch (err) {
         console.error(
@@ -1014,6 +1029,12 @@ function MusicWorld({ onBack }) {
 
         {!loading && !error && (
           <SpotifyPlaylist
+            playlistId={
+              spotifySettings?.spotify_playlist_id
+            }
+            playlistUrl={
+              spotifySettings?.spotify_playlist_url
+            }
             selectedTrack={selectedTrack}
           />
         )}
