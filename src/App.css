@@ -1117,20 +1117,14 @@ button {
 
 .memories-header {
   position: relative;
-
   z-index: 20;
-
   width: min(1200px, 92vw);
-
   margin: 0 auto;
-
   padding-top: 32px;
-
   display: grid;
-
-  grid-template-columns: 1fr auto 1fr;
-
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
+  gap: 16px;
 }
 
 .memories-back-button {
@@ -1883,8 +1877,18 @@ button {
 @media (max-width: 800px) {
   .memories-header {
     grid-template-columns: auto 1fr auto;
-
     gap: 12px;
+  }
+
+  .memories-add-button {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .memories-counter {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    justify-self: end;
   }
 
   .memories-title {
@@ -2041,6 +2045,17 @@ button {
 
   .memory-viewer-details h2 {
     font-size: 22px;
+  }
+  .memories-add-button {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border-radius: 50%;
+    justify-self: end;
+  }
+
+  .memories-add-button span:last-child {
+    display: none;
   }
 }
 
@@ -9099,38 +9114,45 @@ button {
 /* ============================================
    ADD MEMORY OVERLAY
 ============================================ */
-.memories-add-button{
-  position: fixed;
-  z-index: 99999;
-  top: 22px;
-  right: 22px;
+.memories-add-button {
+  justify-self: end;
 
-  min-width: 100px;
-  min-height: 50px;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
 
-  border-radius: 12%;
+  padding: 10px 16px;
 
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255, 120, 190, 0.25),
-      rgba(100, 40, 130, 0.15)
-    );
+  border: 1px solid rgba(255, 180, 220, 0.15);
+  border-radius: 999px;
 
-  border:
-    1px solid
-      rgba(255, 255, 255, 0.08);
+  background: rgba(255, 150, 205, 0.08);
 
-  color: white;
+  color: rgba(255, 235, 245, 0.85);
 
-  font-size: 10px;
+  font-family: inherit;
+  font-size: 13px;
 
   cursor: pointer;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
 }
+
+.memories-add-button:hover {
+  transform: translateY(-2px);
+
+  background: rgba(255, 150, 205, 0.15);
+
+  border-color: rgba(255, 190, 220, 0.35);
+}
+
+.memories-add-button span:first-child {
+  font-size: 18px;
+}
+
 .add-memory-overlay {
   position: fixed;
   inset: 0;
@@ -15790,7 +15812,7 @@ button {
     pointer-events: none;
   }
 }
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
   .universe-header {
     padding-top: 22px;
@@ -15883,9 +15905,9 @@ button {
   }
 
   .planet-details {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    width: 100%;
+    left: 50%;
+    bottom:-70px;
 
     padding: 20px 16px;
   }
