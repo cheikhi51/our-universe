@@ -11168,6 +11168,309 @@ button {
     font-size: 24px;
   }
 }
+
+/* =================================
+   UNIVERSE SETUP
+================================= */
+
+.universe-setup-card {
+  width: min(460px, 100%);
+}
+
+/* ---------------------------------
+   BACK BUTTON
+--------------------------------- */
+
+.auth-card .auth-back-button {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 0;
+  padding: 8px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+
+  box-shadow: none;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.auth-card .auth-back-button:hover {
+  transform: translateX(-3px);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border-color: rgba(255, 255, 255, 0.18);
+
+  color: white;
+}
+
+/* ---------------------------------
+   CREATE / JOIN CHOICE LIST
+--------------------------------- */
+
+.universe-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin-top: 4px;
+
+  text-align: left;
+}
+
+.auth-card .universe-choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  width: 100%;
+
+  margin-top: 0;
+  padding: 16px 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.015)
+    );
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow: none;
+
+  color: white;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.auth-card .universe-choice:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(200, 150, 255, 0.3);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(190, 110, 220, 0.1),
+      rgba(255, 255, 255, 0.02)
+    );
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.25),
+    0 0 25px rgba(150, 90, 220, 0.1);
+}
+
+.universe-choice-icon {
+  flex-shrink: 0;
+
+  width: 46px;
+  height: 46px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  font-size: 21px;
+}
+
+.universe-choice-content {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.universe-choice-content strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.universe-choice-content small {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.universe-choice > span:last-child {
+  flex-shrink: 0;
+
+  color: rgba(255, 255, 255, 0.3);
+
+  font-size: 16px;
+
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.universe-choice:hover > span:last-child {
+  transform: translateX(4px);
+
+  color: rgba(220, 180, 255, 0.8);
+}
+
+/* ---------------------------------
+   INVITE CODE
+--------------------------------- */
+
+.invite-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  margin: 6px 0 22px;
+  padding: 22px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.invite-code-label {
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+}
+
+.invite-code {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 6px;
+
+  background: linear-gradient(90deg, #fff, #d9c4ff, #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.invite-code-hint {
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 11px;
+}
+
+/* ---------------------------------
+   SUCCESS MESSAGE
+--------------------------------- */
+
+.auth-success {
+  margin: 14px 0 0;
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  background: rgba(150, 220, 170, 0.08);
+  border: 1px solid rgba(150, 220, 170, 0.18);
+
+  color: #a8f0bf;
+
+  font-size: 13px;
+}
+
+/* ---------------------------------
+   SECONDARY BUTTON
+--------------------------------- */
+
+.auth-card .secondary-auth-button {
+  margin-top: 12px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow: none;
+
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-card .secondary-auth-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background: rgba(255, 255, 255, 0.09);
+
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ---------------------------------
+   MOBILE
+--------------------------------- */
+
+@media (max-width: 500px) {
+  .universe-setup-card {
+    width: 100%;
+  }
+
+  .auth-card .auth-back-button {
+    top: 16px;
+    left: 16px;
+
+    padding: 7px 12px;
+
+    font-size: 11px;
+  }
+
+  .auth-card .universe-choice {
+    padding: 14px 15px;
+    gap: 12px;
+  }
+
+  .universe-choice-icon {
+    width: 40px;
+    height: 40px;
+
+    font-size: 18px;
+  }
+
+  .invite-code {
+    font-size: 28px;
+    letter-spacing: 4px;
+  }
+}
+
 /* =================================
    CHAPTER FORM SCROLLBAR
 ================================= */
