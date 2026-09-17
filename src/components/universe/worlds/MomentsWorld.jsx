@@ -661,14 +661,6 @@ function MomentsWorld({ onBack }) {
               Let's add the first little piece
               of our story.
             </p>
-
-            <button
-              onClick={() =>
-                setShowAddMoment(true)
-              }
-            >
-              Add Our First Moment
-            </button>
           </div>
         )}
 
