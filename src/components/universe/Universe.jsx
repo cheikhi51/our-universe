@@ -4,6 +4,7 @@ import { planets } from "../../data/planets";
 
 import Planet from "./Planet";
 import PlanetDetails from "./PlanetDetails";
+import Logout from "../auth/Logout";
 
 import MemoriesWorld from "./worlds/MemoriesWorld";
 import MessagesWorld from "./worlds/MessagesWorld";
@@ -441,7 +442,10 @@ function Universe() {
 
       <div className="stars stars-three" />
 
-
+        {/* =================================
+          Logout Button
+      ================================= */}
+      <Logout/>
       {/* =================================
           HEADER
       ================================= */}
